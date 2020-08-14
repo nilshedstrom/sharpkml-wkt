@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpKml-WKT", "SharpKml-WKT\SharpKml-WKT.csproj", "{ED7B1AFC-E4C0-4235-9A7C-2E3FE428BE20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpKml-WKT", "SharpKml-WKT\SharpKml-WKT.csproj", "{ED7B1AFC-E4C0-4235-9A7C-2E3FE428BE20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpKml-WKT.Tests", "SharpKml-WKT.Tests\SharpKml-WKT.Tests.csproj", "{42AFA4F0-3D2C-4811-B319-C0F4DC35A97C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{ED7B1AFC-E4C0-4235-9A7C-2E3FE428BE20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED7B1AFC-E4C0-4235-9A7C-2E3FE428BE20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED7B1AFC-E4C0-4235-9A7C-2E3FE428BE20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42AFA4F0-3D2C-4811-B319-C0F4DC35A97C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42AFA4F0-3D2C-4811-B319-C0F4DC35A97C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42AFA4F0-3D2C-4811-B319-C0F4DC35A97C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42AFA4F0-3D2C-4811-B319-C0F4DC35A97C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,6 @@
 ﻿using SharpKml.Base;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -31,7 +32,7 @@ namespace SharpKml_WKT.Base
 
 		public static string AsCoordinatePair(this Vector coordinate)
 		{
-			return $"{coordinate.Longitude} {coordinate.Latitude}";
+			return $"{coordinate.Longitude.ToString(CultureInfo.InvariantCulture)} {coordinate.Latitude.ToString(CultureInfo.InvariantCulture)}";
 		}
 	}
 }

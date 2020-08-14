@@ -93,7 +93,7 @@ namespace SharpKml_WKT.Dom
 		private static string GenerateMultiplePolygonWKT(List<Vector[][]> polygons)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append("MULTIPOLYGON(");
+			sb.Append("MULTIPOLYGON (");
 			sb.Append(polygons[0].AsWKT());
 			foreach (var polygon in polygons.Skip(1))
 			{
@@ -117,10 +117,9 @@ namespace SharpKml_WKT.Dom
 		private static string GeneratePolygonWKT(Vector[][] polygon)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append("POLYGON(");
+			sb.Append("POLYGON ");
 			sb.Append(polygon.AsWKT());
-			sb.Append(")");
-			return sb.ToString();
+            return sb.ToString();
 		}
 	}
 }
