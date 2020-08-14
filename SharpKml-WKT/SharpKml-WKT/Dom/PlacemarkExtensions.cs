@@ -50,6 +50,39 @@ namespace SharpKml_WKT.Dom
 		}
 
 		/// <summary>
+		/// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
+		/// Currently only supports placemarks with MultipleGeometry or Polygon Geometries.
+		/// </summary>
+		/// <param name="placemark">The placemark instance.</param>
+		/// <returns>
+		/// A <c>string</c> containing the well known text string for the geometry in the
+		/// placemark.
+		/// </returns>
+		/// <exception cref="ArgumentNullException">placemark is null.</exception>
+		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry or Polygon.</exception>
+		public static string AsWKT(this IEnumerable<Placemark> placemarks)
+		{
+			if (placemarks == null)
+			{
+				throw new ArgumentNullException();
+			}
+
+            var placemarkArray = placemarks.ToArray();
+			if(placemarkArray.Any(p => !(p.Geometry is MultipleGeometry) && !(p.Geometry is Polygon)))
+            {
+                throw new NotImplementedException("Only implemented types are Polygon and MultiplePolygon");
+			}
+
+            List<Vector[][]> coordinates = placemarkArray.SelectMany(p => p.ConvertToCoordinates()).ToList();
+			if (coordinates.Count > 1)
+			{
+				return GenerateMultiplePolygonWKT(coordinates);
+			}
+
+			return GeneratePolygonWKT(coordinates.FirstOrDefault());
+		}
+
+		/// <summary>
 		/// Generates a List of arrays of Vectors for each Polygon in the Placemark <see cref="Placemark"/>.
 		/// </summary>
 		/// <param name="placemark">The placemark instance.</param>

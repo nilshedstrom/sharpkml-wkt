@@ -83,7 +83,7 @@ namespace SharpKml_WKT.Tests
                             {
                                 Longitude = 30,
                                 Latitude = 20
-                            },
+                            }
                         }
                     }
                 }
@@ -120,7 +120,7 @@ namespace SharpKml_WKT.Tests
                             {
                                 Longitude =15,
                                 Latitude = 5
-                            },
+                            }
                         }
                     }
                 }
@@ -203,6 +203,76 @@ namespace SharpKml_WKT.Tests
 
             //Assert
             result.Should().Contain(substring);
+        }
+
+        [Theory]
+        [InlineData("POLYGON ((30 10, 40.5 40, 20 40, 10 20, 30 10))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_single_polygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] {_placemark};
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        } 
+        
+        [Theory]
+        [InlineData("MULTIPOLYGON (((30 10, 40.5 40, 20 40, 10 20, 30 10)),((30 10, 40.5 40, 20 40, 10 20, 30 10)))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_two_polygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] {_placemark, _placemark};
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),((15 5, 40 10, 10 20, 5 10, 15 5)))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_single_multiple_polygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] {_multiplePlacemark};
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),((15 5, 40 10, 10 20, 5 10, 15 5)),((30 20, 45 40, 10 40, 30 20)),((15 5, 40 10, 10 20, 5 10, 15 5)))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_two_multiple_polygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] {_multiplePlacemark, _multiplePlacemark};
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),((15 5, 40 10, 10 20, 5 10, 15 5)),((30 10, 40.5 40, 20 40, 10 20, 30 10)))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_multiple_polygon_and_polygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] {_multiplePlacemark, _placemark};
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
         }
     }
 }
