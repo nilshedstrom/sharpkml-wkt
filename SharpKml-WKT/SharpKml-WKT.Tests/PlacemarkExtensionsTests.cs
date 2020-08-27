@@ -15,6 +15,7 @@ namespace SharpKml_WKT.Tests
         private MultipleGeometry _multipleGeometry;
         private Placemark _multiplePlacemark;
         private Placemark _placemarkWithHole;
+        private Placemark _placemarkWithPoint;
 
         public PlacemarkExtensionsTests()
         {
@@ -205,6 +206,10 @@ namespace SharpKml_WKT.Tests
             {
                 Geometry = _multipleGeometry
             };
+            _placemarkWithPoint = new Placemark
+            {
+                Geometry = new Point {Coordinate = new Vector(15, 5)}
+            };
         }
 
         [Theory]
@@ -294,6 +299,20 @@ namespace SharpKml_WKT.Tests
         {
             //Arrange
             var placemarkArray = new[] { _placemark };
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("POLYGON ((30 10, 40.5 40, 20 40, 10 20, 30 10))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_single_polygon_and_point(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] { _placemark, _placemarkWithPoint };
 
             //Act
             var result = placemarkArray.AsWKT();

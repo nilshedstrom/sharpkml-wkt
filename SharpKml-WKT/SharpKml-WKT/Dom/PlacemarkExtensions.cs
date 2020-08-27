@@ -59,7 +59,6 @@ namespace SharpKml_WKT.Dom
 		/// placemark.
 		/// </returns>
 		/// <exception cref="ArgumentNullException">placemark is null.</exception>
-		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry or Polygon.</exception>
 		public static string AsWKT(this IEnumerable<Placemark> placemarks)
 		{
 			if (placemarks == null)
@@ -67,12 +66,7 @@ namespace SharpKml_WKT.Dom
 				throw new ArgumentNullException();
 			}
 
-            var placemarkArray = placemarks.ToArray();
-			if(placemarkArray.Any(p => !(p.Geometry is MultipleGeometry) && !(p.Geometry is Polygon)))
-            {
-                throw new NotImplementedException("Only implemented types are Polygon and MultiplePolygon");
-			}
-
+            var placemarkArray = placemarks.Where(p => p.Geometry is MultipleGeometry || p.Geometry is Polygon).ToArray();
             List<Vector[][]> coordinates = placemarkArray.SelectMany(p => p.ConvertToCoordinates()).ToList();
 			if (coordinates.Count > 1)
 			{
