@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using SharpKml.Base;
 using SharpKml.Dom;
@@ -16,6 +17,7 @@ namespace SharpKml_WKT.Tests
         private Placemark _multiplePlacemark;
         private Placemark _placemarkWithHole;
         private Placemark _placemarkWithPoint;
+        private Placemark _placemarkWithLinestring;
 
         public PlacemarkExtensionsTests()
         {
@@ -194,6 +196,28 @@ namespace SharpKml_WKT.Tests
                     }
                 }
             });
+
+            var linestring = new LineString
+            {
+                Coordinates = new CoordinateCollection(new List<Vector>
+                {
+                    new Vector
+                    {
+                        Longitude = 30,
+                        Latitude = 10
+                    },
+                    new Vector
+                    {
+                        Longitude = 10,
+                        Latitude = 30
+                    },
+                    new Vector
+                    {
+                        Longitude = 40,
+                        Latitude = 40
+                    }
+                })
+            };
             _placemark = new Placemark
             {
                 Geometry = _polygon
@@ -210,6 +234,10 @@ namespace SharpKml_WKT.Tests
             {
                 Geometry = new Point {Coordinate = new Vector(15, 5)}
             };
+            _placemarkWithLinestring = new Placemark
+            {
+                Geometry = linestring
+            };
         }
 
         [Theory]
@@ -223,6 +251,17 @@ namespace SharpKml_WKT.Tests
         {
             //Act
             var result = _placemark.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }         
+        
+        [Theory]
+        [InlineData("LINESTRING (30 10, 10 30, 40 40)")]
+        public void AsWKT_for_placemark_with_linestring_should_contain_substring(string subString)
+        {
+            //Act
+            var result = _placemarkWithLinestring.AsWKT();
 
             //Assert
             result.Should().Contain(subString);

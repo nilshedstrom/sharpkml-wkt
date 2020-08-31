@@ -17,7 +17,7 @@ namespace SharpKml_WKT.Dom
 	{
 		/// <summary>
 		/// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
-		/// Currently only supports placemarks with MultipleGeometry or Polygon Geometries.
+		/// Currently only supports placemarks with MultipleGeometry, Polygon and LineString Geometries.
 		/// </summary>
 		/// <param name="placemark">The placemark instance.</param>
 		/// <returns>
@@ -25,7 +25,7 @@ namespace SharpKml_WKT.Dom
 		/// placemark.
 		/// </returns>
 		/// <exception cref="ArgumentNullException">placemark is null.</exception>
-		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry or Polygon.</exception>
+		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry, Polygon or LineString.</exception>
 		public static string AsWKT(this Placemark placemark)
 		{
 			if (placemark == null)
@@ -33,9 +33,9 @@ namespace SharpKml_WKT.Dom
 				throw new ArgumentNullException();
 			}
 
-			if (!(placemark.Geometry is MultipleGeometry) && !(placemark.Geometry is Polygon))
+			if (!(placemark.Geometry is MultipleGeometry) && !(placemark.Geometry is Polygon) && !(placemark.Geometry is LineString))
 			{
-				throw new NotImplementedException("Only implemented types are Polygon and MultiplePolygon");
+				throw new NotImplementedException("Only implemented types are Polygon, MultiplePolygon and LineString");
 			}
 
 			List<Vector[][]> coordinates = placemark.ConvertToCoordinates();
@@ -43,6 +43,11 @@ namespace SharpKml_WKT.Dom
 			if (placemark.Geometry is MultipleGeometry)
 			{
 				return GenerateMultiplePolygonWKT(coordinates);
+			}			
+            
+            if (placemark.Geometry is LineString)
+			{
+				return GenerateLineStringWKT(coordinates.FirstOrDefault());
 			}
 
 			return GeneratePolygonWKT(coordinates.FirstOrDefault());
@@ -85,7 +90,7 @@ namespace SharpKml_WKT.Dom
 		/// placemark.
 		/// </returns>
 		/// <exception cref="ArgumentNullException">placemark is null.</exception>
-		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry or Polygon.</exception>
+		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry, Polygon or LineString.</exception>
 		private static List<Vector[][]> ConvertToCoordinates(this Placemark placemark)
 		{
 			if (placemark == null)
@@ -93,20 +98,18 @@ namespace SharpKml_WKT.Dom
 				throw new ArgumentNullException();
 			}
 
-			if (!(placemark.Geometry is MultipleGeometry) && !(placemark.Geometry is Polygon))
+			if (!(placemark.Geometry is MultipleGeometry) && !(placemark.Geometry is Polygon) && !(placemark.Geometry is LineString))
 			{
-				throw new ArgumentException("Expecting MultipleGeometry or Polygon");
+				throw new ArgumentException("Expecting MultipleGeometry, Polygon or LineString");
 			}
 
-			List<Vector[][]> Polygons = new List<Vector[][]>();
+            if (placemark.Geometry is LineString)
+            {
+                return placemark.Flatten().OfType<CoordinateCollection>().Select(x => x.AsVectorCoordinates()).ToList();
+            }
 
-			foreach (Polygon polygon in placemark.Flatten().OfType<Polygon>())
-			{
-				Polygons.Add(polygon.AsVectorCoordinates());
-			}
-
-			return Polygons;
-		}
+            return placemark.Flatten().OfType<Polygon>().Select(x => x.AsVectorCoordinates()).ToList();
+        }
 
 		/// <summary>
 		/// Generates a Multipolygon WKT string for a MultipleGeometry that has been 
@@ -146,6 +149,24 @@ namespace SharpKml_WKT.Dom
 			StringBuilder sb = new StringBuilder();
 			sb.Append("POLYGON ");
 			sb.Append(polygon.AsWKT());
+            return sb.ToString();
+		}
+
+		/// <summary>
+		/// Generates a LineString WKT string for a LineString that has been 
+		/// extracted from a <see cref="Placemark"/>.
+		/// </summary>
+		/// <param name="lineString">The lineString vectors.</param>
+		/// <returns>
+		/// A <c>string</c> containing the WKT data of a <see cref="LineString"/> in the
+		/// placemark.
+		/// </returns>
+		private static string GenerateLineStringWKT(Vector[][] lineString)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append("LINESTRING (");
+            sb.Append(lineString[0].AsCoordinateString());
+            sb.Append(")");
             return sb.ToString();
 		}
 	}
