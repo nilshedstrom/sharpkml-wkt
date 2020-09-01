@@ -55,18 +55,19 @@ namespace SharpKml_WKT.Dom
 
 		}
 
-        /// <summary>
-        /// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
-        /// Currently only supports placemarks with MultipleGeometry, Polygon or LineString Geometries .
-        /// </summary>
-        /// <param name="placemark">The placemark instance.</param>
-        /// <param name="convertLineStringToPolygon">If line strings should be converted to polygons</param>
-        /// <returns>
-        /// A <c>string</c> containing the well known text string for the geometry in the
-        /// placemark.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">placemark is null.</exception>
-        public static string AsWKT(this IEnumerable<Placemark> placemarks, bool convertLineStringToPolygon = false)
+		/// <summary>
+		/// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
+		/// Currently only supports placemarks with MultipleGeometry, Polygon or LineString Geometries .
+		/// </summary>
+		/// <param name="placemark">The placemark instance.</param>
+		/// <param name="convertLineStringToPolygon">If line strings should be converted to polygons</param>
+		/// <returns>
+		/// A <c>string</c> containing the well known text string for the geometry in the
+		/// placemark.
+		/// </returns>
+		/// <exception cref="ArgumentNullException">Placemark is null.</exception>
+		/// <exception cref="NotImplementedException">Mix of linestring and polygon or MultipleGeometry when convertLineStringToPolygon is false</exception>
+		public static string AsWKT(this IEnumerable<Placemark> placemarks, bool convertLineStringToPolygon = false)
 		{
 			if (placemarks == null)
 			{
@@ -74,6 +75,11 @@ namespace SharpKml_WKT.Dom
 			}
 
             var placemarkArray = placemarks.Where(p => p.Geometry is MultipleGeometry || p.Geometry is Polygon || p.Geometry is LineString).ToArray();
+            if (!convertLineStringToPolygon && placemarkArray.Any(x => x.Geometry is LineString) &&
+                placemarkArray.Any(x => x.Geometry is Polygon || x.Geometry is MultipleGeometry))
+            {
+				throw new NotImplementedException("Placemarks with mix of LineString and Polygon or MultipleGeometry is not supported when convertLineStringToPolygon is false");
+            }
             List<Vector[][]> coordinates = placemarkArray.SelectMany(p => p.ConvertToCoordinates()).ToList();
             if (!convertLineStringToPolygon && placemarkArray.All(p => p.Geometry is LineString))
             {

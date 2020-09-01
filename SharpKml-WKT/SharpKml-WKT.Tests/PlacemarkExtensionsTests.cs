@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using SharpKml.Base;
@@ -495,6 +496,16 @@ namespace SharpKml_WKT.Tests
 
             //Assert
             result.Should().Contain(subString);
+        }
+
+        [Fact]
+        public void PlaceMark_array_AsWKT_should_return_throw_exception_for__mixed_polygons_and_linestrings_with_convertLineStringToPolygon_as_false()
+        {
+            //Arrange
+            var placemarkArray = new[] { _placemark, _placemarkWithLinestring };
+
+            //Act & Assert
+            placemarkArray.Invoking(x => x.AsWKT()).Should().Throw<NotImplementedException>();
         }
     }
 }
