@@ -265,6 +265,17 @@ namespace SharpKml_WKT.Tests
 
             //Assert
             result.Should().Contain(subString);
+        }          
+        
+        [Theory]
+        [InlineData("POLYGON ((30 10, 10 30, 40 40))")]
+        public void AsWKT_for_placemark_with_linestring_and_convert_to_polygon_should_contain_substring(string subString)
+        {
+            //Act
+            var result = _placemarkWithLinestring.AsWKT(true);
+
+            //Assert
+            result.Should().Contain(subString);
         }        
         
         [Theory]
@@ -411,6 +422,76 @@ namespace SharpKml_WKT.Tests
 
             //Act
             var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),((15 5, 40 10, 10 20, 5 10, 15 5)),((30 10, 10 30, 40 40)))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_multiple_polygon_and_linestring_with_convertLineStringToPolygon_as_true(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] { _multiplePlacemark, _placemarkWithLinestring };
+
+            //Act
+            var result = placemarkArray.AsWKT(true);
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("MULTILINESTRING ((30 10, 10 30, 40 40),(30 10, 10 30, 40 40))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_multiple_linestrings(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] { _placemarkWithLinestring, _placemarkWithLinestring };
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }        
+        
+        [Theory]
+        [InlineData("LINESTRING (30 10, 10 30, 40 40)")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_linestring(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] { _placemarkWithLinestring };
+
+            //Act
+            var result = placemarkArray.AsWKT();
+
+            //Assert
+            result.Should().Contain(subString);
+        }
+
+        [Theory]
+        [InlineData("POLYGON ((30 10, 10 30, 40 40))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_linestring_with_convertLineStringToPolygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] { _placemarkWithLinestring };
+
+            //Act
+            var result = placemarkArray.AsWKT(true);
+
+            //Assert
+            result.Should().Contain(subString);
+        }
+
+        [Theory]
+        [InlineData("MULTIPOLYGON (((30 10, 10 30, 40 40)),((30 10, 10 30, 40 40)))")]
+        public void PlaceMark_array_AsWKT_should_return_correct_result_for_linestrings_with_convertLineStringToPolygon(string subString)
+        {
+            //Arrange
+            var placemarkArray = new[] { _placemarkWithLinestring, _placemarkWithLinestring };
+
+            //Act
+            var result = placemarkArray.AsWKT(true);
 
             //Assert
             result.Should().Contain(subString);

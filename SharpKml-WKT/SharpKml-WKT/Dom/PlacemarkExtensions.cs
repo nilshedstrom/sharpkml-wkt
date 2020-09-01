@@ -15,18 +15,19 @@ namespace SharpKml_WKT.Dom
 	/// </summary>
 	public static class PlacemarkExtensions
 	{
-		/// <summary>
-		/// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
-		/// Currently only supports placemarks with MultipleGeometry, Polygon and LineString Geometries.
-		/// </summary>
-		/// <param name="placemark">The placemark instance.</param>
-		/// <returns>
-		/// A <c>string</c> containing the well known text string for the geometry in the
-		/// placemark.
-		/// </returns>
-		/// <exception cref="ArgumentNullException">placemark is null.</exception>
-		/// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry, Polygon or LineString.</exception>
-		public static string AsWKT(this Placemark placemark)
+        /// <summary>
+        /// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
+        /// Currently only supports placemarks with MultipleGeometry, Polygon and LineString Geometries.
+        /// </summary>
+        /// <param name="placemark">The placemark instance.</param>
+        /// <param name="convertLineStringToPolygon">If linestring should be converted to polygon</param>
+        /// <returns>
+        /// A <c>string</c> containing the well known text string for the geometry in the
+        /// placemark.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">placemark is null.</exception>
+        /// <exception cref="ArgumentException">placemark geometry is not a MultipleGeometry, Polygon or LineString.</exception>
+        public static string AsWKT(this Placemark placemark, bool convertLineStringToPolygon = false)
 		{
 			if (placemark == null)
 			{
@@ -45,7 +46,7 @@ namespace SharpKml_WKT.Dom
 				return GenerateMultiplePolygonWKT(coordinates);
 			}			
             
-            if (placemark.Geometry is LineString)
+            if (placemark.Geometry is LineString && !convertLineStringToPolygon)
 			{
 				return GenerateLineStringWKT(coordinates.FirstOrDefault());
 			}
@@ -54,32 +55,32 @@ namespace SharpKml_WKT.Dom
 
 		}
 
-		/// <summary>
-		/// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
-		/// Currently only supports placemarks with MultipleGeometry or Polygon Geometries.
-		/// </summary>
-		/// <param name="placemark">The placemark instance.</param>
-		/// <returns>
-		/// A <c>string</c> containing the well known text string for the geometry in the
-		/// placemark.
-		/// </returns>
-		/// <exception cref="ArgumentNullException">placemark is null.</exception>
-		public static string AsWKT(this IEnumerable<Placemark> placemarks)
+        /// <summary>
+        /// Generates a WKT string for the polygons in a Placemark <see cref="Placemark"/>.
+        /// Currently only supports placemarks with MultipleGeometry, Polygon or LineString Geometries .
+        /// </summary>
+        /// <param name="placemark">The placemark instance.</param>
+        /// <param name="convertLineStringToPolygon">If line strings should be converted to polygons</param>
+        /// <returns>
+        /// A <c>string</c> containing the well known text string for the geometry in the
+        /// placemark.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">placemark is null.</exception>
+        public static string AsWKT(this IEnumerable<Placemark> placemarks, bool convertLineStringToPolygon = false)
 		{
 			if (placemarks == null)
 			{
 				throw new ArgumentNullException();
 			}
 
-            var placemarkArray = placemarks.Where(p => p.Geometry is MultipleGeometry || p.Geometry is Polygon).ToArray();
+            var placemarkArray = placemarks.Where(p => p.Geometry is MultipleGeometry || p.Geometry is Polygon || p.Geometry is LineString).ToArray();
             List<Vector[][]> coordinates = placemarkArray.SelectMany(p => p.ConvertToCoordinates()).ToList();
-			if (coordinates.Count > 1)
-			{
-				return GenerateMultiplePolygonWKT(coordinates);
-			}
-
-			return GeneratePolygonWKT(coordinates.FirstOrDefault());
-		}
+            if (!convertLineStringToPolygon && placemarkArray.All(p => p.Geometry is LineString))
+            {
+                return coordinates.Count > 1 ? GenerateMultipleLineStringWKT(coordinates) : GenerateLineStringWKT(coordinates.FirstOrDefault());
+            }
+            return coordinates.Count > 1 ? GenerateMultiplePolygonWKT(coordinates) : GeneratePolygonWKT(coordinates.FirstOrDefault());
+        }
 
 		/// <summary>
 		/// Generates a List of arrays of Vectors for each Polygon in the Placemark <see cref="Placemark"/>.
@@ -135,7 +136,30 @@ namespace SharpKml_WKT.Dom
 
 		}
 
-		/// <summary>
+        /// <summary>
+		/// Generates a MultiLionesstring WKT string for a MultipleLinestring that has been 
+		/// extracted from a <see cref="Placemark"/>.
+		/// </summary>
+		/// <param name="polygons">The list of polygon vectors.</param>
+		/// <returns>
+		/// A <c>string</c> containing the WKT data of every <see cref="Polygon"/> in the
+		/// placemark.
+		/// </returns>
+		private static string GenerateMultipleLineStringWKT(List<Vector[][]> polygons)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append("MULTILINESTRING ((");
+			sb.Append(polygons[0][0].AsCoordinateString());
+			foreach (var polygon in polygons.Skip(1))
+			{
+				sb.Append("),(");
+				sb.Append(polygon[0].AsCoordinateString());
+			}
+			sb.Append("))");
+			return sb.ToString();
+		}
+
+        /// <summary>
 		/// Generates a Polygon WKT string for a Polygon that has been 
 		/// extracted from a <see cref="Placemark"/>.
 		/// </summary>
